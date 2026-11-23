@@ -2,6 +2,9 @@
 
 Jalrakshak is an irrigation dashboard. It uses crop, soil, and weather information to estimate irrigation need as **Low**, **Medium**, or **High**.
 
+# Live Demo: 
+https://jalrakshak-d5zw.netlify.app/
+
 ## Two dashboard versions
 
 - `app.py` runs the Streamlit version on your computer. It trains a Random Forest model from the irrigation dataset.
