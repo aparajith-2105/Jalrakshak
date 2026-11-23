@@ -8,6 +8,8 @@ Keep `index.html` and the `data` folder together. Run a local static web server 
 
 The project also retains an optional Streamlit/Python version (`app.py`) for local use. It is separate from the static dashboard.
 
+The static dashboard includes rule-based sensor checks when the user provides multiple same-zone readings or uploads a time-series CSV with `moisture0`…`moistureN` columns. It checks stale readings (24-hour threshold), out-of-range values, peer disagreement, repeated identical samples, and changes in sensor offset relative to peers. When multiple fresh probes agree, their median is used as the model's soil-moisture input. These checks flag possible problems; they do not prove that a sensor is faulty or replace calibration.
+
 ## Run locally
 
 1. Install Python 3.10 or newer.
@@ -40,7 +42,7 @@ The classifier predicts the `Low`, `Medium`, or `High` label found in the suppli
 
 `IOT-temp.csv` contains air temperature, not soil moisture. All irrigation labels in the three supplied plant vase files were `False`, so they cannot teach a positive/negative irrigation-action model. These auxiliary datasets are included for later exploration and are not silently mixed into training. `weather-1.csv` is a 2025 snapshot and is not treated as current live weather. The NASA links originally shared were duplicate documentation URLs; runtime data is requested from the NASA POWER API endpoint.
 
-Treat predictions as decision support. Validate the model against local crop, soil, sensor, and irrigation outcomes before operational use. Sensor drift/fouling detection and calibrated water-volume recommendations need labeled field data and hardware details and are not claimed in this starter build.
+Treat predictions and sensor flags as decision support. Validate the model and thresholds against local crop, soil, sensor, and irrigation outcomes before operational use. The sensor checks are heuristics rather than a trained sensor-failure classifier; calibrated water-volume recommendations need labeled field data and hardware details and are not claimed in this starter build.
 
 ## Database
 
