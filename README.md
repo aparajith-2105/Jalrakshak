@@ -1,6 +1,15 @@
 # Jalrakshak — Intelligent Irrigation Prediction System
 
-A Streamlit dashboard that trains a Random Forest classifier on the included irrigation dataset, accepts field and crop inputs, optionally retrieves recent NASA POWER daily weather, and stores recommendations in a local SQLite database.
+A dashboard that trains a Random Forest classifier on the included irrigation dataset, accepts field and crop inputs, and optionally retrieves recent NASA POWER daily weather. It includes both a Vercel-ready browser dashboard and a local Streamlit dashboard.
+
+## Deploy on Vercel
+
+1. Push the contents of this folder to a GitHub repository.
+2. Import that repository in Vercel and deploy with the default static build settings (no build command or output directory is required).
+3. `index.html` is the browser dashboard; `api/predict.py` is the Python prediction function. Vercel's Python runtime is currently Beta. The function trains/caches the model within each warm serverless instance, so the first prediction can take longer.
+4. The Vercel version stores history in the browser's local storage on that device. Local SQLite history is only used by the Streamlit version.
+
+The project root contains `requirements.txt` for the Python function. Keep the included `data/irrigation_prediction.csv`; the API needs it to train the model.
 
 ## Run locally
 
@@ -10,11 +19,11 @@ A Streamlit dashboard that trains a Random Forest classifier on the included irr
    ```powershell
    py -m venv .venv
    .\.venv\Scripts\Activate.ps1
-   python -m pip install -r requirements.txt
+   python -m pip install -r requirements-local.txt
    streamlit run app.py
    ```
 
-The model trains at startup using `data/irrigation_prediction.csv`. Recommendations are stored in `jalrakshak.sqlite3` in this folder. NASA POWER lookup needs an internet connection and latitude/longitude; if unavailable, the app uses the manual weather values entered by the user.
+The Streamlit model trains at startup using `data/irrigation_prediction.csv`. Recommendations are stored in `jalrakshak.sqlite3` in this folder. NASA POWER lookup needs an internet connection and latitude/longitude; if unavailable, the app uses the manual weather values entered by the user.
 
 ## What is included
 
