@@ -11,6 +11,17 @@ A dashboard that trains a Random Forest classifier on the included irrigation da
 
 The project root contains `requirements.txt` for the Python function. Keep the included `data/irrigation_prediction.csv`; the API needs it to train the model.
 
+## Test the Vercel version locally before deploying
+
+Do not use VS Code Live Server or open `index.html` directly for predictions: those only serve the page and do not run `/api/predict`. From this project folder, install the Vercel CLI and run its local development server:
+
+```powershell
+npm install --global vercel
+vercel dev
+```
+
+Open the local URL printed by `vercel dev`. This runs the page and Python API together without deploying. The first prediction can take time while the classifier trains. Alternatively, run the separate Streamlit version with `streamlit run app.py` after installing `requirements-local.txt`.
+
 ## Run locally
 
 1. Install Python 3.10 or newer.
