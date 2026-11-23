@@ -18,7 +18,7 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements-local.txt
 .\.venv\Scripts\python.exe -m streamlit run app.py
 
-## Database
+**Database**
 
 The Streamlit version saves recommendation history in a local SQLite database named `jalrakshak.sqlite3`. It is created automatically when the app runs.
 
