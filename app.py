@@ -43,16 +43,16 @@ if page == "Irrigation dashboard":
         states = sorted(frame["Region"].dropna().astype(str).unique())
         crops = sorted(frame["Crop_Type"].dropna().astype(str).unique())
         soils = sorted(frame["Soil_Type"].dropna().astype(str).unique())
-        regions = a.selectbox("State / region", states)
-        crop = b.selectbox("Crop type", crops)
-        soil = c.selectbox("Soil type", soils)
+        regions = a.selectbox("Region (training data)", states, index=None, placeholder="Select a region")
+        crop = b.selectbox("Crop type", crops, index=None, placeholder="Select a crop")
+        soil = c.selectbox("Soil type", soils, index=None, placeholder="Select soil type")
         d,e,f = st.columns(3)
-        stage = d.selectbox("Growth stage", sorted(frame["Crop_Growth_Stage"].dropna().astype(str).unique()))
-        season = e.selectbox("Season", sorted(frame["Season"].dropna().astype(str).unique()))
-        irr_type = f.selectbox("Irrigation method", sorted(frame["Irrigation_Type"].dropna().astype(str).unique()))
+        stage = d.selectbox("Growth stage", sorted(frame["Crop_Growth_Stage"].dropna().astype(str).unique()), index=None, placeholder="Select a stage")
+        season = e.selectbox("Season", sorted(frame["Season"].dropna().astype(str).unique()), index=None, placeholder="Select a season")
+        irr_type = f.selectbox("Irrigation method", sorted(frame["Irrigation_Type"].dropna().astype(str).unique()), index=None, placeholder="Select a method")
         g,h,i = st.columns(3)
-        water_source = g.selectbox("Water source", sorted(frame["Water_Source"].dropna().astype(str).unique()))
-        mulching = h.selectbox("Mulching used", ["Yes", "No"])
+        water_source = g.selectbox("Water source", sorted(frame["Water_Source"].dropna().astype(str).unique()), index=None, placeholder="Select a source")
+        mulching = h.selectbox("Mulching used", ["Yes", "No"], index=None, placeholder="Select yes or no")
         area = i.number_input("Field area (hectares)", min_value=0.01, max_value=10000.0, value=1.0, step=0.1)
         j,k,l = st.columns(3)
         moisture = j.slider("Soil moisture (%)", 0.0, 100.0, float(frame.Soil_Moisture.median()))
@@ -75,6 +75,13 @@ if page == "Irrigation dashboard":
         submitted = st.form_submit_button("Predict irrigation need", type="primary", use_container_width=True)
 
     if submitted:
+        categorical_inputs = {"Region": regions, "Crop type": crop, "Soil type": soil, "Growth stage": stage,
+                              "Season": season, "Irrigation method": irr_type, "Water source": water_source,
+                              "Mulching used": mulching}
+        missing = [label for label, value in categorical_inputs.items() if value is None]
+        if missing:
+            st.error("Please select: " + ", ".join(missing) + ".")
+            st.stop()
         weather_note = "Manual weather inputs"
         if use_nasa:
             weather = fetch_daily_weather(latitude, longitude)

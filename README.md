@@ -1,26 +1,12 @@
 # Jalrakshak — Intelligent Irrigation Prediction System
 
-A dashboard that trains a Random Forest classifier on the included irrigation dataset, accepts field and crop inputs, and optionally retrieves recent NASA POWER daily weather. It includes both a Vercel-ready browser dashboard and a local Streamlit dashboard.
+A standalone dashboard that uses a browser-side k-nearest-neighbors classifier on the included irrigation dataset, accepts field and crop inputs, and optionally retrieves recent NASA POWER daily weather. The `index.html` version is static and can be hosted by any static web host. It does not require a Python server or prediction API.
 
-## Deploy on Vercel
+## Run or host the static dashboard
 
-1. Push the contents of this folder to a GitHub repository.
-2. Import that repository in Vercel and deploy with the default static build settings (no build command or output directory is required).
-3. `index.html` is the browser dashboard; `api/predict.py` is the Python prediction function. Vercel's Python runtime is currently Beta. The function trains/caches the model within each warm serverless instance, so the first prediction can take longer.
-4. The Vercel version stores history in the browser's local storage on that device. Local SQLite history is only used by the Streamlit version.
+Keep `index.html` and the `data` folder together. Run a local static web server from this folder (for example, VS Code Live Server) and open the served page. Directly opening the HTML with a `file://` URL may prevent the browser from fetching the training CSV. To host, upload the folder contents to any static hosting provider; no provider-specific configuration is needed. NASA POWER lookup needs internet access and a browser that permits the NASA API request; manual weather inputs remain available if the request fails.
 
-The project root contains `requirements.txt` for the Python function. Keep the included `data/irrigation_prediction.csv`; the API needs it to train the model.
-
-## Test the Vercel version locally before deploying
-
-Do not use VS Code Live Server or open `index.html` directly for predictions: those only serve the page and do not run `/api/predict`. From this project folder, install the Vercel CLI and run its local development server:
-
-```powershell
-npm install --global vercel
-vercel dev
-```
-
-Open the local URL printed by `vercel dev`. This runs the page and Python API together without deploying. The first prediction can take time while the classifier trains. Alternatively, run the separate Streamlit version with `streamlit run app.py` after installing `requirements-local.txt`.
+The project also retains an optional Streamlit/Python version (`app.py`) for local use. It is separate from the static dashboard.
 
 ## Run locally
 
