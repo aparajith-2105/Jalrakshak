@@ -1,53 +1,49 @@
-# Jalrakshak
+# Jalrakshak — Intelligent Irrigation Prediction System
 
-Jalrakshak is an irrigation dashboard. It uses crop, soil, and weather information to estimate irrigation need as **Low**, **Medium**, or **High**.
+A standalone dashboard that uses a browser-side k-nearest-neighbors classifier on the included irrigation dataset, accepts field and crop inputs, and optionally retrieves recent NASA POWER daily weather. The `index.html` version is static and can be hosted by any static web host. It does not require a Python server or prediction API.
 
-# Demo: 
-https://jalrakshak-d5zw.netlify.app/
+## Run or host the static dashboard
 
-## Two dashboard versions
+Keep `index.html` and the `data` folder together. Run a local static web server from this folder (for example, VS Code Live Server) and open the served page. Directly opening the HTML with a `file://` URL may prevent the browser from fetching the training CSV. To host, upload the folder contents to any static hosting provider; no provider-specific configuration is needed. NASA POWER lookup needs internet access and a browser that permits the NASA API request; manual weather inputs remain available if the request fails.
 
-- `app.py` runs the Streamlit version on your computer. It trains a Random Forest model from the irrigation dataset.
-- `index.html` is the static website version. It uses a browser-based k-nearest-neighbors model and can be hosted on Vercel or another static web host.
+The project also retains an optional Streamlit/Python version (`app.py`) for local use. It is separate from the static dashboard.
 
-The two versions work separately and use different prediction models.
+The static dashboard includes rule-based sensor checks when the user provides multiple same-zone readings or uploads a time-series CSV with `moisture0`…`moistureN` columns. It checks stale readings (24-hour threshold), out-of-range values, peer disagreement, repeated identical samples, and changes in sensor offset relative to peers. When multiple fresh probes agree, their median is used as the model's soil-moisture input. These checks flag possible problems; they do not prove that a sensor is faulty or replace calibration.
 
-## Run the Streamlit version in VS Code
+## Run locally
 
-Open the Jalrakshak folder in VS Code. Choose **Terminal → New Terminal**, then run these commands one at a time:
+1. Install Python 3.10 or newer.
+2. Open a terminal in this folder and create an environment:
 
-~~~powershell
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements-local.txt
-.\.venv\Scripts\python.exe -m streamlit run app.py
-~~~
+   ```powershell
+   py -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   python -m pip install -r requirements-local.txt
+   streamlit run app.py
+   ```
 
-Open the local web address shown in the terminal.
+The Streamlit model trains at startup using `data/irrigation_prediction.csv`. Recommendations are stored in `jalrakshak.sqlite3` in this folder. NASA POWER lookup needs an internet connection and latitude/longitude; if unavailable, the app uses the manual weather values entered by the user.
 
-## Run or host the static version
+## What is included
 
-Keep `index.html` and the `data` folder together. To preview the dashboard, open the project with VS Code Live Server.
+- `data/irrigation_prediction.csv` — supervised training data with `Irrigation_Need` labels.
+- `data/Crop_recommendation.csv` — agronomy reference dataset.
+- `data/weather-1.csv` — state/district weather snapshot.
+- `data/IOT-temp.csv` — indoor/outdoor temperature log.
+- `data/plant_vase*.CSV` — plant moisture sensor logs.
+- `data/csv` — agricultural market price data.
+- `model.py` — preprocessing, stratified holdout evaluation, and classifier training.
+- `database.py` — SQLite recommendation history.
+- `nasa_power.py` — NASA POWER daily API integration.
 
-To host it, upload `index.html` and the `data` folder to Vercel or another static web host. The NASA POWER weather option needs an internet connection. If it is unavailable, enter weather values manually.
+## Data interpretation and limits
 
-## **Database**
+The classifier predicts the `Low`, `Medium`, or `High` label found in the supplied irrigation dataset. It does not calculate verified liters or valve runtime. The label's physical meaning and source quality have not been independently verified, and the classes are imbalanced. The dashboard displays held-out accuracy and macro F1 so users can see basic performance, but these scores do not establish farm-level validity.
 
-The Streamlit version saves recommendation history in a local SQLite database named `jalrakshak.sqlite3`. The app creates this file automatically.
+`IOT-temp.csv` contains air temperature, not soil moisture. All irrigation labels in the three supplied plant vase files were `False`, so they cannot teach a positive/negative irrigation-action model. These auxiliary datasets are included for later exploration and are not silently mixed into training. `weather-1.csv` is a 2025 snapshot and is not treated as current live weather. The NASA links originally shared were duplicate documentation URLs; runtime data is requested from the NASA POWER API endpoint.
 
-Each saved recommendation includes the time, field inputs, prediction, confidence score, and weather source.
+Treat predictions and sensor flags as decision support. Validate the model and thresholds against local crop, soil, sensor, and irrigation outcomes before operational use. The sensor checks are heuristics rather than a trained sensor-failure classifier; calibrated water-volume recommendations need labeled field data and hardware details and are not claimed in this starter build.
 
-The static website saves history in the browser on that device. Browser history is not shared between users or devices.
+## Database
 
-## Sensor checks
-
-The static dashboard can compare readings from multiple probes or check an uploaded sensor history CSV. History files should have moisture columns named like `moisture0`, `moisture1`, and so on.
-
-The dashboard flags possible stale readings, unusual values, probes that disagree, repeated readings, and possible drift. These are warnings, not confirmation that a sensor has failed. The Streamlit version does not include these sensor checks.
-
-## Data and limitations
-
-The model uses `data/irrigation_prediction.csv`. Its labels are **Low**, **Medium**, and **High**; they are not exact water amounts or valve runtimes.
-
-The other included CSV files are reference data. They are not all used to train the irrigation model. NASA POWER weather is optional and requires an internet connection and location coordinates.
-
-Use the results as estimates and check field conditions before making irrigation decisions.
+SQLite stores each user-submitted recommendation, its input values, prediction, model probability, and weather source. The database file is created on first launch and is excluded from source control by `.gitignore`.
