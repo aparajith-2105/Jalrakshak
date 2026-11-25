@@ -4,7 +4,7 @@ Jalrakshak is a crop irrigation decision-support project. It uses field conditio
 
 The goal is to help users make more informed irrigation decisions and reduce the risk of over-irrigation or under-irrigation. The system provides an estimate for review; it does not operate pumps or valves.
 
-**Live-Dashboard:**https://jalrakshak-snce.onrender.com
+**Live-Dashboard:** https://jalrakshak-snce.onrender.com
 
 ## The problem
 
