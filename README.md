@@ -4,77 +4,48 @@ Jalrakshak is a crop irrigation decision-support project. It uses field conditio
 
 The goal is to help users make more informed irrigation decisions and reduce the risk of over-irrigation or under-irrigation. The system provides an estimate for review; it does not operate pumps or valves.
 
-**Demo:**https://jalrakshak-snce.onrender.com
+**Demo:** https://jalrakshak-d5zw.netlify.app/
 
-## The problem
+## 🎯 What It Does
 
-Irrigation decisions can be difficult when field readings are incomplete, inaccurate, or out of date. Soil sensors may drift, become fouled, or stop working. A system that relies on one reading without checking its quality may recommend too much or too little water.
+- Predicts irrigation need as **Low**, **Medium**, or **High**.
+- Uses information such as crop type, soil moisture, temperature, rainfall, and humidity.
+- Can request recent weather data from NASA POWER.
+- Checks optional sensor readings for stale, unusual, or disagreeing values.
+- Includes a simulation that shows how sensor drift can affect a prediction.
+- Saves a history of recommendations.
 
-Jalrakshak brings crop, soil, weather, and optional sensor-history information together in one dashboard. It is designed to show an irrigation estimate and highlight possible sensor concerns when the relevant readings are provided.
+## 🚀 Run the Dashboard in VS Code
 
-## Project objectives
+1. Open the Jalrakshak project folder in VS Code.
+2. Make sure `index.html` and the `data` folder are together in the same folder.
+3. Install the **Live Server** extension if needed.
+4. Right-click `index.html` and select **Open with Live Server**.
 
-- Estimate irrigation need from the available field and weather inputs.
-- Present the result in a dashboard that is easy to understand.
-- Use optional sensor readings or uploaded sensor history to support sensor-health checks.
-- Show the datasets and model information used by the project.
-- Keep the result as decision support so that users can verify field conditions before acting.
+Use Live Server to open the dashboard. Opening the file directly with a `file://` address can prevent it from loading its training data.
 
-## Dashboard features
+## 🌐 Netlify Deployment
 
-### Field dashboard
+The static dashboard can be deployed through Netlify.
 
-Users can enter details such as:
+Make sure the published folder contains both `index.html` and the `data` folder. The data folder is needed for the dashboard to load its training examples.
 
-- Region, crop, growth stage, soil type, and season
-- Field area
-- Soil moisture, temperature, and relative humidity
-- Recent rainfall, sunlight, and wind speed
-- Soil pH, organic carbon, and electrical conductivity
-- Previous irrigation, irrigation method, and water source
-- Optional location coordinates for NASA POWER weather data
+The Netlify deployment hosts the static dashboard. The optional Streamlit app is a separate Python application.
 
-The dashboard uses the supplied values to produce an irrigation-need estimate and related guidance.
+## 🧪 Run the Optional Streamlit App
 
-### Sensor health
+Open a PowerShell terminal in the project folder and run:
 
-Sensor-health inputs are optional. Users can provide readings from multiple probes or upload sensor-history data, where supported, to help identify readings that may be stale, inconsistent, or unusual.
+    py -m venv .venv
+    .\.venv\Scripts\Activate.ps1
+    python -m pip install -r requirements-local.txt
+    streamlit run app.py
 
-This is a check on the data provided to the application. It does not mean that the project is automatically connected to physical IoT sensors or continuously monitoring a field.
+## 🧠 Model and Results
 
-### Model and data
+The browser dashboard loads `data/irrigation_prediction.csv` and uses a k-nearest-neighbors model to predict an irrigation need category.
 
-This section presents information about the model, its evaluation, and the data files included with the project. Evaluation results describe performance on the available dataset; they do not guarantee the same performance in every field.
-
-### Recommendation history
-
-This section displays saved recommendations when history is available in the running application.
-
-## Data used
-
-The project uses the supplied datasets for different purposes. They are not all combined into one training table.
-
-| Dataset | Project use |
-|---|---|
-| `irrigation_prediction.csv` | Main supervised dataset for predicting the `Irrigation_Need` label |
-| `Crop_recommendation.csv` | Crop and agronomy reference data |
-| `weather-1.csv` | Weather context and reference data |
-| `IOT-temp.csv` | Temperature readings; these are not soil-moisture measurements |
-| `plant_vase1.CSV`, `plant_vase1(2).CSV`, `plant_vase2.CSV` | Plant or moisture sensor logs for reference and optional sensor analysis |
-| `csv` | Agricultural market-price reference data, where included |
-| NASA POWER daily data | Weather information for a selected location and date range, when requested by the application |
-
-The role of each dataset depends on its columns and quality. A dataset is not treated as a model input or an irrigation label unless its contents support that use.
-
-## Model and methodology
-
-1. The project loads and examines the available datasets.
-2. The irrigation training data is prepared for supervised learning.
-3. A classification model is trained to predict the irrigation-need category.
-4. The model is evaluated using held-out data and classification metrics.
-5. The dashboard passes user-provided field values to the trained model and displays its prediction.
-
-The model predicts the categories represented in its training data. Entering values in the dashboard requests a prediction; it does **not** automatically add those values to the training data or retrain the model.
+The result is decision support. It is **not** a measured water quantity or valve runtime. The confidence shown is a model score and does not guarantee that the recommendation is correct for a particular field.
 
 ## Sensor limitations
 
@@ -98,44 +69,34 @@ Some browser features may require a local server instead of opening the HTML fil
 
 If you are using the Python or Streamlit application, install its dependencies and run it using the instructions for that application. A static HTML host does not run Python or Streamlit code.
 
-## Deploying the static dashboard on Render
+## 🗂️ Included Data
 
-Render Static Sites can serve the HTML, CSS, JavaScript, and other static files in this project.
+The `data` folder contains:
 
-1. Sign in to [Render](https://render.com/).
-2. Select **New → Static Site**.
-3. Connect GitHub and select the `Jalrakshak` repository.
-4. Select the branch you want to deploy, usually `main`.
-5. Leave **Build Command** blank for a plain static site.
-6. Set **Publish Directory** to `.` if `index.html` is in the repository root.
-7. Create the static site and wait for deployment to finish.
+- `irrigation_prediction.csv` — labeled examples used by the browser model.
+- `Crop_recommendation.csv` — crop recommendation dataset.
+- `weather-1.csv` — weather data snapshot.
+- `IOT-temp.csv` — temperature readings.
+- `plant_vase1.CSV`, `plant_vase1(2).CSV`, and `plant_vase2.CSV` — plant sensor readings.
+- `csv` — additional agricultural data.
 
-Render redeploys the connected site when changes are pushed to the selected Git branch. See the [Render Static Sites guide](https://render.com/docs/static-sites).
+The dashboard does not automatically use every file for training. The browser model uses `irrigation_prediction.csv`.
 
-> **Important:** A Render Static Site serves static files. It does not run `app.py` or a Streamlit server. If the dashboard needs a Python backend to make predictions, that backend must be hosted separately and the frontend must be configured to connect to it.
+## 🗄️ Database and Saved History
 
-## Limitations
+The CSV files in `data` are datasets. The optional Streamlit app uses SQLite to save recommendation records in `jalrakshak.sqlite3`.
 
-- Predictions depend on the quality and coverage of the training data.
-- Training labels may not represent verified water volumes or audited field outcomes.
-- Sensor checks depend on the readings and history supplied to the application.
-- NASA POWER data provides weather context; it does not replace local field measurements.
-- Recommendations are estimates and should be checked against local conditions and agricultural guidance.
-- The project is a prototype and should not directly control irrigation hardware without further testing.
+The static browser dashboard stores recommendation history in the browser on the device where it is used.
 
-## Future improvements
+## 🌦️ NASA POWER
 
-- Collect field data with verified irrigation outcomes.
-- Validate the model across crops, regions, soil types, and seasons.
-- Add more labeled examples of sensor drift, fouling, and hardware failure.
-- Connect physical sensors through a secure IoT service.
-- Compare recommendations with expert or field-validated decisions.
+Recent NASA POWER daily weather is optional and requires an internet connection and field coordinates. If the request is unavailable, users can enter weather values manually.
 
-## References
+[NASA POWER daily API documentation](https://power.larc.nasa.gov/docs/services/api/temporal/daily/)
 
-- [NASA POWER API documentation](https://power.larc.nasa.gov/docs/services/api/temporal/daily/)
-- [Render Static Sites documentation](https://render.com/docs/static-sites)
+## ⚠️ Project Limitations
 
-## Project note
-
-Jalrakshak is an educational decision-support project. Always confirm field conditions before making irrigation decisions.
+- Predictions are categories, not verified water amounts.
+- Sensor warnings are rule-based checks; they do not prove that a sensor has failed.
+- The simulation uses artificial readings and does not establish real-world sensor performance.
+- Validate results with local crops, soil, sensors, and field measurements before using them for irrigation decisions.
