@@ -1,90 +1,53 @@
-# 🌱 Jalrakshak — Smart Irrigation Dashboard
+# 🌱 Jalrakshak — Smart Irrigation
 
-Jalrakshak estimates a field’s irrigation need using crop, soil, and weather information. It also includes checks that can flag potentially unreliable sensor readings.
+Jalrakshak is an irrigation decision-support dashboard. It uses field and weather information to help estimate irrigation needs and display the results.
 
-**Demo:** https://jalrakshak-d5zw.netlify.app/
+**Demo:** https://jalrakshak-snce.onrender.com
 
-## 🎯 What It Does
+## Features
 
-- Predicts irrigation need as **Low**, **Medium**, or **High**.
-- Uses information such as crop type, soil moisture, temperature, rainfall, and humidity.
-- Can request recent weather data from NASA POWER.
-- Checks optional sensor readings for stale, unusual, or disagreeing values.
-- Includes a simulation that shows how sensor drift can affect a prediction.
-- Saves a history of recommendations.
+- Enter crop, soil, location, and weather details
+- View an irrigation estimate and related guidance
+- Explore the model and project data
+- Review saved recommendation history
 
-## 🚀 Run the Dashboard in VS Code
+## Project files
 
-1. Open the Jalrakshak project folder in VS Code.
-2. Make sure `index.html` and the `data` folder are together in the same folder.
-3. Install the **Live Server** extension if needed.
-4. Right-click `index.html` and select **Open with Live Server**.
+- `index.html` — dashboard page
+- `data/` or `Datasets/` — project data files
+- `README.md` — project information
 
-Use Live Server to open the dashboard. Opening the file directly with a `file://` address can prevent it from loading its training data.
+## Run the dashboard locally
 
-## 🌐 Netlify Deployment
+1. Download or clone this repository.
+2. Open the project folder.
+3. Open `index.html` in a browser.
 
-The static dashboard can be deployed through Netlify.
+If the dashboard uses browser requests or local data files, run it with a local development server such as VS Code Live Server.
 
-Make sure the published folder contains both `index.html` and the `data` folder. The data folder is needed for the dashboard to load its training examples.
+## Deploy on Render
 
-The Netlify deployment hosts the static dashboard. The optional Streamlit app is a separate Python application.
+This project can be deployed as a **Render Static Site** when the dashboard files are static HTML, CSS, and JavaScript.
 
-## 🧪 Run the Optional Streamlit App
+1. Sign in to [Render](https://render.com/).
+2. Select **New → Static Site**.
+3. Connect GitHub and choose the `Jalrakshak` repository.
+4. Select the branch to deploy, usually `main`.
+5. Set **Build Command** to blank.
+6. Set **Publish Directory** to `.` if `index.html` is in the repository's main folder.
+7. Select **Create Static Site** and wait for the deployment to finish.
 
-Open a PowerShell terminal in the project folder and run:
+Render will show the website URL on the static site's page. Open that URL to view the dashboard and share it with others. When you push later changes to the connected branch, Render can deploy the updated files. See [Render's Static Site guide](https://render.com/docs/static-sites).
 
-    py -m venv .venv
-    .\.venv\Scripts\Activate.ps1
-    python -m pip install -r requirements-local.txt
-    streamlit run app.py
+## Important
 
-## 🧠 Model and Results
+A Render **Static Site** serves files such as `index.html`. It does not run Python files such as `app.py` or a Streamlit application. If the dashboard depends on a Python backend, that backend must be deployed separately and the dashboard must be configured to connect to it.
 
-The browser dashboard loads `data/irrigation_prediction.csv` and uses a k-nearest-neighbors model to predict an irrigation need category.
+## Data and model note
 
-The result is decision support. It is **not** a measured water quantity or valve runtime. The confidence shown is a model score and does not guarantee that the recommendation is correct for a particular field.
+The dashboard provides estimates for decision support. Results depend on the available data and the values entered. Check field conditions before making irrigation decisions.
 
-## 📡 Sensor Checks and Simulation
+## Hosting
 
-Users can enter readings from multiple probes or upload a sensor history CSV. Jalrakshak checks for issues such as:
-
-- Readings outside the expected range
-- Old or stale readings
-- Disagreement between probes
-- Repeated identical readings
-- Possible changes in readings over time
-
-The drift simulation artificially changes one of five readings and compares the model’s response with the result after the sensor check. It is a software demonstration, not a test of physical sensors.
-
-## 🗂️ Included Data
-
-The `data` folder contains:
-
-- `irrigation_prediction.csv` — labeled examples used by the browser model.
-- `Crop_recommendation.csv` — crop recommendation dataset.
-- `weather-1.csv` — weather data snapshot.
-- `IOT-temp.csv` — temperature readings.
-- `plant_vase1.CSV`, `plant_vase1(2).CSV`, and `plant_vase2.CSV` — plant sensor readings.
-- `csv` — additional agricultural data.
-
-The dashboard does not automatically use every file for training. The browser model uses `irrigation_prediction.csv`.
-
-## 🗄️ Database and Saved History
-
-The CSV files in `data` are datasets. The optional Streamlit app uses SQLite to save recommendation records in `jalrakshak.sqlite3`.
-
-The static browser dashboard stores recommendation history in the browser on the device where it is used.
-
-## 🌦️ NASA POWER
-
-Recent NASA POWER daily weather is optional and requires an internet connection and field coordinates. If the request is unavailable, users can enter weather values manually.
-
-[NASA POWER daily API documentation](https://power.larc.nasa.gov/docs/services/api/temporal/daily/)
-
-## ⚠️ Project Limitations
-
-- Predictions are categories, not verified water amounts.
-- Sensor warnings are rule-based checks; they do not prove that a sensor has failed.
-- The simulation uses artificial readings and does not establish real-world sensor performance.
-- Validate results with local crops, soil, sensors, and field measurements before using them for irrigation decisions.
+- **Host:** Render Static Sites
+- **Website link:** https://jalrakshak-snce.onrender.com
